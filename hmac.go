@@ -37,9 +37,10 @@ func Authenticate(req *http.Request) (err error) {
 
   canonicalRep, err := canonicalRep(req)
   if err != nil {
+    log.Printf("ERROR creating canonicalRep: %s", err)
     return err
   }
-  sharedSecret := []byte(os.Getenv("SHARED_SECRET"))
+  sharedSecret := []byte(os.Getenv("GAUTH_SHARED_SECRET"))
   expectedMAC := computeSignature([]byte(canonicalRep), sharedSecret)
 
   if !hmac.Equal(signature, expectedMAC){
@@ -67,7 +68,6 @@ func canonicalRep(req *http.Request) (rep string, err error) {
   if err != nil {
     return rep, err
   }
-  log.Printf("--- req.Form: %s", req.Form)
   var repBuff bytes.Buffer
 
   // HTTP verb (GET, POST,...) uppercased
@@ -77,7 +77,6 @@ func canonicalRep(req *http.Request) (rep string, err error) {
 
   // original headers
   headers := req.Header
-  log.Printf("--- req.Header: %s", headers)
   if hmacDate := headers[xHMACDate]; len(hmacDate) > 0 {
     repBuff.WriteString("date:"+hmacDate[0]+"\n")
   } else {
