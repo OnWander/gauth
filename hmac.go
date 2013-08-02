@@ -32,8 +32,13 @@ func Authenticate(req *http.Request) (err error) {
     return errors.New("Malformed auth-tokens")
   }
 
-  //apiKey := authTkns[0]
+  apiKey := []byte(authTkns[0])
   signature := []byte(authTkns[1])
+
+  if !checkApiClient(apiKey) {
+    log.Println("ERROR unknown API client")
+    return errors.New("Error authenticating")
+  }
 
   canonicalRep, err := canonicalRep(req)
   if err != nil {
@@ -48,6 +53,11 @@ func Authenticate(req *http.Request) (err error) {
   }
 
   return nil
+}
+
+func checkApiClient(apiKey []byte) bool {
+  // constant time byte comparison
+  return hmac.Equal(apiKey, []byte(os.Getenv("GAUTH_API_TOKEN")))
 }
 
 func checkMAC(message, messageMAC, key []byte) bool {
