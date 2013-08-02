@@ -7,7 +7,7 @@ Usage:
 ```go
 import (
   ....
-  "github.com/onwander/gauth"
+  "github.com/OnWander/gauth"
 )
 
 func handleSomeHttpReq(res http.ResponseWriter, req *http.Request) {
