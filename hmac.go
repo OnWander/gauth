@@ -50,8 +50,8 @@ func Authenticate(req *http.Request) (err error) {
 
   if !hmac.Equal(signature, expectedMAC){
     log.Printf("ERROR signature and expectedMAC mismatch for:\n%s", canonicalRep)
-    log.Printf("*** expected signature: %s", expectedMAC)
-    log.Printf("*** computed signature: %s", signature)
+    log.Printf("*** expected signature: %s", string(expectedMAC))
+    log.Printf("*** computed signature: %s", string(signature))
     return errors.New("Error authenticating")
   }
 
