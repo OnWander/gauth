@@ -5,6 +5,7 @@ import (
   "crypto/hmac"
   "crypto/sha256"
   "errors"
+  "encoding/hex"
   "net/http"
   "os"
   "strings"
@@ -63,18 +64,19 @@ func checkApiClient(apiKey []byte) bool {
   return hmac.Equal(apiKey, []byte(os.Getenv("GAUTH_API_TOKEN")))
 }
 
-func checkMAC(message, messageMAC, key []byte) bool {
-  mac := hmac.New(sha256.New, key)
+func computeSignature(message, sharedSecret []byte) []byte {
+  mac := hmac.New(sha256.New, sharedSecret)
   mac.Write(message)
-  expectedMAC := mac.Sum(nil)
-  return hmac.Equal(messageMAC, expectedMAC)
+  return []byte(hex.EncodeToString(mac.Sum(nil)))
 }
 
+/*
 func computeSignature(message, sharedSecret []byte) []byte {
   mac := hmac.New(sha256.New, sharedSecret)
   mac.Write(message)
   return mac.Sum(nil)
 }
+*/
 
 func canonicalRep(req *http.Request) (rep string, err error) {
   err = req.ParseMultipartForm(defaultMaxMemory)
